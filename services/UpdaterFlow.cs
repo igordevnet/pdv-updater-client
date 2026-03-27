@@ -1,32 +1,28 @@
 using System;
+using PdvUpdater.Api;
+using PdvUpdater.DTOs;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace PdvUpdater.Services
-{
-    public class UpdaterFlow
-    {
-        private readonly FileService _fileService;
-        private readonly string _newFileName = "PDV_Atualizado.exe";
-        public UpdaterFlow()
-        {
-            _fileService = new FileService();
+namespace PdvUpdater.Services {
+    public class UpdaterFlow { 
+
+        private readonly ApiClient _apiClient;
+
+        public UpdaterFlow() {
+            this._apiClient = new ApiClient();
         }
-        public async Task StartUpdateAsync(string apiUrl)
-        {
-            Console.WriteLine("Iniciando a busca por atualizações...");
 
-            bool isSuccess = await _fileService.DownloadFileAsync(apiUrl, _newFileName);
+        public async Task downloadNewVersion(string accessToken) {
+            string deviceName = DeviceVault.GetDeviceName();
 
-            if (isSuccess)
+            var downloadDto = new DownloadFileRequestDto 
             {
-                Console.WriteLine("Download concluído, PDV atualizado.");
-                
-                Environment.Exit(0); 
-            }
-            else
-            {
-                Console.WriteLine("Falha ao atualizar. O PDV continuará na versão atual.");
-            }
+                accessToken = accessToken,
+                deviceName = deviceName,
+            };
+
+            await _apiClient.DownloadFileAsync(downloadDto, @"PdvFX.exe");
         }
     }
 }

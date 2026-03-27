@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = pdv_updater_client
-build_property.ProjectDir = C:\Users\Suporte 01\Desktop\New_Project\pdv_updater_client\
+build_property.ProjectDir = C:\Users\Igor\Desktop\New folder\pdv-updater-client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

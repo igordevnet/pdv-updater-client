@@ -1,7 +1,15 @@
-public class LoginRequestDTO
-{
-    private string name { get; set; }
-    private string password { get; set; }
-    private string deviceName { get; set; }
-    private string deviceId { get; set; }
+using Newtonsoft.Json;
+
+namespace PdvUpdater.DTOs{
+    public class LoginRequestDto
+    {
+        [JsonProperty("name")]
+        public string name { get; set; }
+        [JsonProperty("password")]
+        public string password { get; set; }
+        [JsonProperty("deviceName")]
+        public string deviceName { get; set; }
+        [JsonProperty("deviceId")]
+        public string deviceId { get; set; }
+    }
 }

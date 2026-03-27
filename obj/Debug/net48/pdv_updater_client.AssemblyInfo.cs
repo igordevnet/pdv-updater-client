@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("pdv_updater_client")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+adc504f84509a46baac259401b6c1fcf43a867d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("pdv_updater_client")]
 [assembly: System.Reflection.AssemblyTitleAttribute("pdv_updater_client")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

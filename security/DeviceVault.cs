@@ -3,26 +3,26 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class TokenVault
+public static class DeviceVault
 {
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
         "PdvUpdater", 
-        "auth.dat"
+        "device.dat"
     );
 
-    public static void SaveRefreshToken(string token)
+    public static void SaveDeviceName(string deviceName)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
 
-        byte[] tokenBytes = Encoding.UTF8.GetBytes(token);
+        byte[] deviceBytes = Encoding.UTF8.GetBytes(deviceName);
 
-        byte[] encryptedBytes = ProtectedData.Protect(tokenBytes, null, DataProtectionScope.CurrentUser);
+        byte[] encryptedBytes = ProtectedData.Protect(deviceBytes, null, DataProtectionScope.CurrentUser);
 
         File.WriteAllBytes(FilePath, encryptedBytes);
     }
 
-    public static string GetRefreshToken()
+    public static string GetDeviceName()
     {
         if (!File.Exists(FilePath))
             return null;

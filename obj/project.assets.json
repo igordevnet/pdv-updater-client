@@ -1,27 +1,88 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.8": {},
-    ".NETFramework,Version=v4.8/win-x86": {}
+    ".NETFramework,Version=v4.8": {
+      "Newtonsoft.Json/13.0.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      }
+    },
+    ".NETFramework,Version=v4.8/win-x86": {
+      "Newtonsoft.Json/13.0.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Newtonsoft.Json/13.0.4": {
+      "sha512": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
+      "type": "package",
+      "path": "newtonsoft.json/13.0.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "README.md",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/net6.0/Newtonsoft.Json.dll",
+        "lib/net6.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.0/Newtonsoft.Json.dll",
+        "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.3/Newtonsoft.Json.dll",
+        "lib/netstandard1.3/Newtonsoft.Json.xml",
+        "lib/netstandard2.0/Newtonsoft.Json.dll",
+        "lib/netstandard2.0/Newtonsoft.Json.xml",
+        "newtonsoft.json.13.0.4.nupkg.sha512",
+        "newtonsoft.json.nuspec",
+        "packageIcon.png"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.8": []
+    ".NETFramework,Version=v4.8": [
+      "Newtonsoft.Json >= 13.0.4"
+    ]
   },
   "packageFolders": {
-    "C:\\Users\\Suporte 01\\.nuget\\packages\\": {}
+    "C:\\Users\\Igor\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Suporte 01\\Desktop\\New_Project\\pdv_updater_client\\pdv_updater_client.csproj",
+      "projectUniqueName": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj",
       "projectName": "pdv_updater_client",
-      "projectPath": "C:\\Users\\Suporte 01\\Desktop\\New_Project\\pdv_updater_client\\pdv_updater_client.csproj",
-      "packagesPath": "C:\\Users\\Suporte 01\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Suporte 01\\Desktop\\New_Project\\pdv_updater_client\\obj\\",
+      "projectPath": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj",
+      "packagesPath": "C:\\Users\\Igor\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Suporte 01\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Igor\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net48"
@@ -50,6 +111,12 @@
     "frameworks": {
       "net48": {
         "targetAlias": "net48",
+        "dependencies": {
+          "Newtonsoft.Json": {
+            "target": "Package",
+            "version": "[13.0.4, )"
+          }
+        },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
       }
     },

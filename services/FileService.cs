@@ -1,31 +1,29 @@
 using System;
 using System.Net; 
 using System.Threading.Tasks;
+using PdvUpdater.Api;
+using System.Diagnostics;
 
 namespace PdvUpdater.Services 
 {
     public class FileService
     {
+        private readonly ApiClient _apiClient;
+
         public FileService()
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            this._apiClient = new ApiClient();
         }
 
-        public async Task<bool> DownloadFileAsync(string downloadUrl, string destinationPath)
+        public async Task<Boolean>compareVersion(string accessToken)
         {
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    await client.DownloadFileTaskAsync(new Uri(downloadUrl), destinationPath);
-                }
-                
-                return true; 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao baixar o arquivo: " + ex.Message);
-                return false; 
+            var serverVersion = await _apiClient.GetVersionAsync(accessToken);
+            var localVersion = FileVersionInfo.GetVersionInfo(@"PdvFX.exe");
+
+            if (new Version(serverVersion.version) > new Version(localVersion.FileVersion)) {
+                return true;
+            } else {
+                return false;
             }
         }
     }
