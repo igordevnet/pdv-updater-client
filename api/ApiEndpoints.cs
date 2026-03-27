@@ -7,8 +7,8 @@ namespace PdvUpdater.Api {
 
         public static string checkVersion => $"{_baseUrl}/updates/check";
 
-        public static string download(string deviceName) {
-            return $"{_baseUrl}/updates/download?deviceName={deviceName}";
-        }
+        public static string download => $"{_baseUrl}/updates/download";
+
+        public static string save => $"{_baseUrl}/updates/save";
     } 
 }

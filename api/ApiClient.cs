@@ -60,14 +60,14 @@ namespace PdvUpdater.Api
             return JsonConvert.DeserializeObject<UpdateCheckDto>(responseBody);
         }
 
-        public async Task DownloadFileAsync(DownloadFileRequestDto downloadDto, string path)
+        public async Task DownloadFileAsync(string accessToken, string path)
         {
-            var url = ApiEndpoints.download(downloadDto.deviceName);
+            var url = ApiEndpoints.download;
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", downloadDto.accessToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 using (HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
                 {
@@ -84,6 +84,20 @@ namespace PdvUpdater.Api
                     }
                 }
             }
+        }
+
+        public async Task SaveLastUpdate(SaveLastUpdateDto saveDto)
+        {
+            var url = ApiEndpoints.save;
+            Console.wWriteLine("Teste");
+            
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", saveDto.accessToken);
+
+            string jsonBody = JsonConvert.SerializeObject(saveDto.deviceName);
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

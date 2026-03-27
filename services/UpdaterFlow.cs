@@ -16,13 +16,14 @@ namespace PdvUpdater.Services {
         public async Task downloadNewVersion(string accessToken) {
             string deviceName = DeviceVault.GetDeviceName();
 
-            var downloadDto = new DownloadFileRequestDto 
+            var saveDto = new SaveLastUpdateDto 
             {
                 accessToken = accessToken,
                 deviceName = deviceName,
             };
 
-            await _apiClient.DownloadFileAsync(downloadDto, @"PdvFX.exe");
+            await _apiClient.DownloadFileAsync(accessToken, @"PdvFX.exe");
+            await _apiClient.SaveLastUpdate(saveDto);            
         }
     }
 }

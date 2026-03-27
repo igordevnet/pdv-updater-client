@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 
 namespace PdvUpdater.DTOs{
-    public class DownloadFileRequestDto {
+    public class SaveLastUpdateDto {
          [JsonProperty("accessToken")]
         public string accessToken { get; set; }
         [JsonProperty("deviceName")]
