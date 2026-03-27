@@ -11,21 +11,29 @@ namespace PdvUpdater.Api
 {
     public class ApiClient
     {
-        private readonly HttpClient _httpClient;
+        private static readonly HttpClient _httpClient = new HttpClient();
 
-        public ApiClient() {
-            this._httpClient = new HttpClient();
+        private async Task HandleResponseErrorsAsync(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorBody = await response.Content.ReadAsStringAsync();
+                int statusCode = (int)response.StatusCode;
+
+                throw new Exception($"Erro na API ({statusCode}): {errorBody}");
+            }
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto loginDto)
         {
-            var url = ApiEndpoints.login;
+            var url = ApiEndpoints.Login;
 
             string jsonBody = JsonConvert.SerializeObject(loginDto);
             var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+
+            await HandleResponseErrorsAsync(response);
 
             string responseBody = await response.Content.ReadAsStringAsync();
             
@@ -34,13 +42,14 @@ namespace PdvUpdater.Api
 
         public async Task<AuthResponseDto> RefreshToken(RefreshTokenRequestDto refreshDto) 
         {
-            var url = ApiEndpoints.refresh;
+            var url = ApiEndpoints.Refresh;
             
             string jsonBody = JsonConvert.SerializeObject(refreshDto);
             var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+
+            await HandleResponseErrorsAsync(response);
 
             string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -49,12 +58,13 @@ namespace PdvUpdater.Api
 
         public async Task<UpdateCheckDto> GetVersionAsync(string accessToken)
         {
-            var url = ApiEndpoints.checkVersion;
+            var url = ApiEndpoints.CheckVersion;
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+
+            await HandleResponseErrorsAsync(response);
 
             string responseBody = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<UpdateCheckDto>(responseBody);
@@ -62,7 +72,7 @@ namespace PdvUpdater.Api
 
         public async Task DownloadFileAsync(string accessToken, string path)
         {
-            var url = ApiEndpoints.download;
+            var url = ApiEndpoints.Download;
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {
@@ -72,7 +82,7 @@ namespace PdvUpdater.Api
                 using (HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
                 {
 
-                    response.EnsureSuccessStatusCode();
+                    await HandleResponseErrorsAsync(response);
 
                     using (var fileStream = await response.Content.ReadAsStreamAsync())
                     {
@@ -86,18 +96,20 @@ namespace PdvUpdater.Api
             }
         }
 
-        public async Task SaveLastUpdate(SaveLastUpdateDto saveDto)
+        public async Task NotifyDownloadCompleteAsync(NotifyDownloadCompleteDto saveDto)
         {
-            var url = ApiEndpoints.save;
-            Console.wWriteLine("Teste");
+            var url = ApiEndpoints.Save;
             
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", saveDto.accessToken);
 
-            string jsonBody = JsonConvert.SerializeObject(saveDto.deviceName);
+            var payload = new { deviceName = saveDto.deviceName };
+
+            string jsonBody = JsonConvert.SerializeObject(payload);
             var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+
+            await HandleResponseErrorsAsync(response);
         }
     }
 }

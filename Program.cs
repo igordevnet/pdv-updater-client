@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
-using PdvUpdater.Api;
 using PdvUpdater.DTOs;
 using PdvUpdater.Services;
 
@@ -9,19 +9,21 @@ namespace PdvUpdater
 {
     class Program
     {
-        private static AuthService authService = new AuthService();
+        private static AuthService AuthService = new AuthService();
 
         static async Task Main(string[] args)
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
             string refreshToken = TokenVault.GetRefreshToken();
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                await RunSetupMode(authService);
+                await RunSetupMode(AuthService);
                 return;
             }
 
-            await RunSilentUpdateMode(authService, refreshToken);
+            await RunSilentUpdateMode(AuthService, refreshToken);
         }
 
         static async Task RunSetupMode(AuthService authService)
@@ -47,10 +49,20 @@ namespace PdvUpdater
                 name = name,
                 password = password,
                 deviceName = deviceName,
-                deviceId = "12345",
+                deviceId = Environment.MachineName,
             };
 
-            authService.login(loginDto, deviceName);
+            try
+            {
+                await authService.Login(loginDto, deviceName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n[ERRO] Falha ao registrar este caixa: {ex.Message}");
+                Console.WriteLine("Pressione qualquer tecla para sair...");
+                Console.ReadKey();
+                return;
+            }
 
             Console.WriteLine("\n[SUCESSO] Caixa registrado e vinculado a esta máquina!");
             Console.WriteLine("O atualizador já pode rodar silenciosamente.");
@@ -63,23 +75,48 @@ namespace PdvUpdater
             var refreshDto = new RefreshTokenRequestDto
             {
                 refreshToken = refreshToken,
-                deviceId = "12345",
+                deviceId = Environment.MachineName,
             };
 
-            string accessToken = await authService.refreshToken(refreshDto);
+            string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string pdvPath = Path.Combine(exeFolder, "PdvFX.exe");
 
-            var fileService = new FileService();
-
-            Boolean shouldUpdate = await fileService.compareVersion(accessToken);
-
-            if (shouldUpdate) 
+            try
             {
-                var updaterFlow = new UpdaterFlow();
-                await updaterFlow.downloadNewVersion(accessToken);
-            }
+                string accessToken = await authService.RefreshToken(refreshDto);
 
-            //Process.Start(@"PdvFX.exe");
-            Environment.Exit(0);
+                var fileService = new FileService();
+
+                Boolean shouldUpdate = await fileService.CompareVersion(accessToken);
+
+                if (shouldUpdate)
+                {
+                    var updaterFlow = new UpdaterFlow();
+                 
+                    await updaterFlow.DownloadNewVersion(accessToken);
+                   
+                }
+                else
+                {
+                    Process.Start(pdvPath);
+                    Environment.Exit(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Iniciando o PDV...");
+
+                if (File.Exists(pdvPath))
+                {
+                    Process.Start(pdvPath);
+                }
+
+                Environment.Exit(0);
+            }
         }
 
         static string ReadPasswordHidden()

@@ -11,3 +11,16 @@ C:\Users\Igor\Desktop\New folder\pdv-updater-client\bin\Debug\net48\Newtonsoft.J
 C:\Users\Igor\Desktop\New folder\pdv-updater-client\obj\Debug\net48\pdv_upda.F202D859.Up2Date
 C:\Users\Igor\Desktop\New folder\pdv-updater-client\obj\Debug\net48\pdv_updater_client.exe
 C:\Users\Igor\Desktop\New folder\pdv-updater-client\obj\Debug\net48\pdv_updater_client.pdb
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\bin\Debug\net48\pdv_updater_client.exe.config
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\bin\Debug\net48\pdv_updater_client.exe
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\bin\Debug\net48\pdv_updater_client.pdb
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\bin\Debug\net48\Newtonsoft.Json.dll
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.csproj.AssemblyReference.cache
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.AssemblyInfoInputs.cache
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.AssemblyInfo.cs
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.csproj.CoreCompileInputs.cache
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.sourcelink.json
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_upda.F202D859.Up2Date
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.exe
+C:\Users\Igor-pc\Desktop\programming\pdv-updater-client\pdv-updater-client\obj\Debug\net48\pdv_updater_client.pdb

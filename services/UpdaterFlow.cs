@@ -13,17 +13,39 @@ namespace PdvUpdater.Services {
             this._apiClient = new ApiClient();
         }
 
-        public async Task downloadNewVersion(string accessToken) {
+        public async Task DownloadNewVersion(string accessToken)
+        {
             string deviceName = DeviceVault.GetDeviceName();
+            string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
 
-            var saveDto = new SaveLastUpdateDto 
+            string currentPath = Path.Combine(exeFolder, "PdvFX.exe");
+            string oldPath = Path.Combine(exeFolder, "PdvFX.exe.old");
+
+            if (File.Exists(oldPath))
+            {
+                File.Delete(oldPath);
+            }
+
+            if (File.Exists(currentPath))
+            {
+                File.Move(currentPath, oldPath);
+                Console.WriteLine("Arquivo atual renomeado para .old com sucesso.");
+            }
+
+
+            Console.WriteLine("Baixando a nova versão...");
+
+            await _apiClient.DownloadFileAsync(accessToken, currentPath);
+
+            var saveDto = new NotifyDownloadCompleteDto
             {
                 accessToken = accessToken,
                 deviceName = deviceName,
             };
 
-            await _apiClient.DownloadFileAsync(accessToken, @"PdvFX.exe");
-            await _apiClient.SaveLastUpdate(saveDto);            
+            await _apiClient.NotifyDownloadCompleteAsync(saveDto);
+
+            Console.WriteLine("Download concluído!");
         }
     }
 }

@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj": {}
+    "C:\\Users\\Igor-pc\\Desktop\\programming\\pdv-updater-client\\pdv-updater-client\\pdv_updater_client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj": {
+    "C:\\Users\\Igor-pc\\Desktop\\programming\\pdv-updater-client\\pdv-updater-client\\pdv_updater_client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj",
+        "projectUniqueName": "C:\\Users\\Igor-pc\\Desktop\\programming\\pdv-updater-client\\pdv-updater-client\\pdv_updater_client.csproj",
         "projectName": "pdv_updater_client",
-        "projectPath": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\pdv_updater_client.csproj",
-        "packagesPath": "C:\\Users\\Igor\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Igor\\Desktop\\New folder\\pdv-updater-client\\obj\\",
+        "projectPath": "C:\\Users\\Igor-pc\\Desktop\\programming\\pdv-updater-client\\pdv-updater-client\\pdv_updater_client.csproj",
+        "packagesPath": "C:\\Users\\Igor-pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Igor-pc\\Desktop\\programming\\pdv-updater-client\\pdv-updater-client\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Igor\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Igor-pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net48"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net48": {
@@ -49,7 +56,7 @@
               "version": "[13.0.4, )"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

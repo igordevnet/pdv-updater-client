@@ -11,26 +11,26 @@ namespace PdvUpdater.Services {
             this._apiClient = new ApiClient();
         }
 
-        public async Task login(LoginRequestDto loginDto, string deviceName)
+        public async Task Login(LoginRequestDto loginDto, string deviceName)
         {
             AuthResponseDto tokens = await _apiClient.LoginAsync(loginDto);
-            saveToken(tokens.refresh_token);
-            saveDeviceName(deviceName);
+            SaveToken(tokens.refresh_token);
+            SaveDeviceName(deviceName);
         }
 
-        public async Task<string> refreshToken(RefreshTokenRequestDto refreshDto) 
+        public async Task<string> RefreshToken(RefreshTokenRequestDto refreshDto) 
         {
             AuthResponseDto tokens = await _apiClient.RefreshToken(refreshDto);
-            saveToken(tokens.refresh_token);
+            SaveToken(tokens.refresh_token);
             return tokens.access_token;
         }
 
-        private void saveToken(string refreshToken) 
+        private void SaveToken(string refreshToken) 
         {
             TokenVault.SaveRefreshToken(refreshToken);
         }
 
-        private void saveDeviceName(string deviceName)
+        private void SaveDeviceName(string deviceName)
         {
             DeviceVault.SaveDeviceName(deviceName);
         }
