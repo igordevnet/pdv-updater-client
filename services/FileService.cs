@@ -25,7 +25,7 @@ namespace PdvUpdater.Services
             var serverVersion = await _apiClient.GetVersionAsync(accessToken);
             var localVersion = FileVersionInfo.GetVersionInfo(_pdvPath);
 
-            if (new Version(serverVersion.version) > new Version(localVersion.FileVersion)) {
+            if (new Version(serverVersion.version) > new Version("2.53.0.1")) {
                 return true;
             } else {
                 return false;

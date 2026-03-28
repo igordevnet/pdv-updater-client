@@ -15,7 +15,8 @@ namespace PdvUpdater.Services {
 
         public async Task DownloadNewVersion(string accessToken)
         {
-            string deviceName = DeviceVault.GetDeviceName();
+            var data = DataVault.GetData();
+            string deviceName = data.DeviceName;
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
 
             string currentPath = Path.Combine(exeFolder, "PdvFX.exe");

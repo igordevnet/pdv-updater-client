@@ -1,7 +1,10 @@
-using System;
-using System.Threading.Tasks;
-using PdvUpdater.DTOs;
+using Newtonsoft.Json;
+using pdv_updater_client.model;
 using PdvUpdater.Api;
+using PdvUpdater.DTOs;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace PdvUpdater.Services {
     public class AuthService {
@@ -11,28 +14,25 @@ namespace PdvUpdater.Services {
             this._apiClient = new ApiClient();
         }
 
-        public async Task Login(LoginRequestDto loginDto, string deviceName)
+        public async Task Login(LoginRequestDto loginDto)
         {
             AuthResponseDto tokens = await _apiClient.LoginAsync(loginDto);
-            SaveToken(tokens.refresh_token);
-            SaveDeviceName(deviceName);
+             
+            var data = new VaultData {
+                RefreshToken = tokens.refresh_token,
+                DeviceId = loginDto.deviceId,
+                DeviceName = loginDto.deviceName
+            };
+
+            DataVault.SaveData(data);
         }
 
         public async Task<string> RefreshToken(RefreshTokenRequestDto refreshDto) 
         {
             AuthResponseDto tokens = await _apiClient.RefreshToken(refreshDto);
-            SaveToken(tokens.refresh_token);
+            DataVault.UpdateRefreshToken(tokens.refresh_token);
             return tokens.access_token;
         }
 
-        private void SaveToken(string refreshToken) 
-        {
-            TokenVault.SaveRefreshToken(refreshToken);
-        }
-
-        private void SaveDeviceName(string deviceName)
-        {
-            DeviceVault.SaveDeviceName(deviceName);
-        }
     }
 }

@@ -1,28 +1,32 @@
+using Newtonsoft.Json;
+using pdv_updater_client.model;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class TokenVault
+public static class DataVault
 {
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
         "PdvUpdater", 
-        "auth.dat"
+        "data.dat"
     );
 
-    public static void SaveRefreshToken(string token)
+    public static void SaveData(VaultData data)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
 
-        byte[] tokenBytes = Encoding.UTF8.GetBytes(token);
+        string json = JsonConvert.SerializeObject(data);
 
-        byte[] encryptedBytes = ProtectedData.Protect(tokenBytes, null, DataProtectionScope.CurrentUser);
+        byte[] dataBytes = Encoding.UTF8.GetBytes(json);
+
+        byte[] encryptedBytes = ProtectedData.Protect(dataBytes, null, DataProtectionScope.CurrentUser);
 
         File.WriteAllBytes(FilePath, encryptedBytes);
     }
 
-    public static string GetRefreshToken()
+    public static VaultData GetData()
     {
         if (!File.Exists(FilePath))
             return null;
@@ -32,12 +36,26 @@ public static class TokenVault
             byte[] encryptedBytes = File.ReadAllBytes(FilePath);
             
             byte[] decryptedBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
-            
-            return Encoding.UTF8.GetString(decryptedBytes);
+
+            string json = Encoding.UTF8.GetString(decryptedBytes);
+
+            return JsonConvert.DeserializeObject<VaultData>(json);
         }
         catch (CryptographicException)
         {
             return null; 
+        }
+    }
+
+    public static void UpdateRefreshToken(string newToken)
+    {
+
+        VaultData vault = GetData();
+
+        if (vault != null)
+        {
+            vault.RefreshToken = newToken;
+            SaveData(vault);
         }
     }
 }

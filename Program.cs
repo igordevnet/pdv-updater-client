@@ -15,7 +15,8 @@ namespace PdvUpdater
         {
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
-            string refreshToken = TokenVault.GetRefreshToken();
+            var vaultData = DataVault.GetData();
+            string refreshToken = vaultData?.RefreshToken;
 
             if (string.IsNullOrEmpty(refreshToken))
             {
@@ -49,12 +50,12 @@ namespace PdvUpdater
                 name = name,
                 password = password,
                 deviceName = deviceName,
-                deviceId = Environment.MachineName,
+                deviceId = Guid.NewGuid().ToString(),
             };
 
             try
             {
-                await authService.Login(loginDto, deviceName);
+                await authService.Login(loginDto);
             }
             catch (Exception ex)
             {
@@ -72,10 +73,11 @@ namespace PdvUpdater
 
         static async Task RunSilentUpdateMode(AuthService authService, string refreshToken)
         {
+            var data = DataVault.GetData();
             var refreshDto = new RefreshTokenRequestDto
             {
                 refreshToken = refreshToken,
-                deviceId = Environment.MachineName,
+                deviceId =  data.DeviceId,
             };
 
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -95,11 +97,6 @@ namespace PdvUpdater
                  
                     await updaterFlow.DownloadNewVersion(accessToken);
                    
-                }
-                else
-                {
-                    Process.Start(pdvPath);
-                    Environment.Exit(0);
                 }
             }
             catch (Exception ex)
