@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using PdvUpdater.DTOs;
+using PdvUpdater.Services;
 
 namespace PdvUpdater
 {
     class Program
     {
+        private static AuthService AuthService = new AuthService();
+
         static async Task Main(string[] args)
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
             string refreshToken = TokenVault.GetRefreshToken();
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                RunSetupMode();
-                return; // Encerra após o setup. O técnico abre de novo ou o PC é reiniciado.
+                await RunSetupMode(AuthService);
+                return;
             }
 
-            // 3. MODO SILENCIOSO (Dia a dia da operadora de caixa)
-            await RunSilentUpdateMode(refreshToken);
+            await RunSilentUpdateMode(AuthService, refreshToken);
         }
 
-        static void RunSetupMode()
+        static async Task RunSetupMode(AuthService authService)
         {
             Console.Title = "Setup - Atualizador PDV";
             Console.WriteLine("=========================================");
@@ -31,20 +37,32 @@ namespace PdvUpdater
             string name = Console.ReadLine();
 
             Console.Write("Digite a Senha: ");
-            string password = ReadPasswordHidden(); // Esconde a senha
+            string password = ReadPasswordHidden();
 
             Console.Write("Nome deste Dispositivo (ex: Caixa 01): ");
             string deviceName = Console.ReadLine();
 
             Console.WriteLine("\nAutenticando com o servidor...");
 
-            // AQUI VOCÊ VAI CHAMAR O SEU NESTJS (Rota de Login)
-            // Exemplo fictício:
-            // var token = await ApiClient.LoginAsync(email, password, deviceName);
-            
-            // Simulando o sucesso:
-            string tokenRecebidoDaApi = "eyJh...token_gigante_aqui"; 
-            TokenVault.SaveRefreshToken(tokenRecebidoDaApi);
+            var loginDto = new LoginRequestDto
+           {
+                name = name,
+                password = password,
+                deviceName = deviceName,
+                deviceId = Environment.MachineName,
+            };
+
+            try
+            {
+                await authService.Login(loginDto, deviceName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n[ERRO] Falha ao registrar este caixa: {ex.Message}");
+                Console.WriteLine("Pressione qualquer tecla para sair...");
+                Console.ReadKey();
+                return;
+            }
 
             Console.WriteLine("\n[SUCESSO] Caixa registrado e vinculado a esta máquina!");
             Console.WriteLine("O atualizador já pode rodar silenciosamente.");
@@ -52,20 +70,55 @@ namespace PdvUpdater
             Console.ReadKey();
         }
 
-        static async Task RunSilentUpdateMode(string refreshToken)
+        static async Task RunSilentUpdateMode(AuthService authService, string refreshToken)
         {
-            // O ideal é não dar nenhum Console.WriteLine aqui para o CMD fechar na velocidade da luz.
-            
-            // 1. Bate no NestJS com o Refresh Token para pegar o Access Token
-            // 2. Chama a rota GET /updates/check
-            // 3. Se precisar, baixa o arquivo e faz a troca (File.Move)
-            
-            // 4. Inicia o PDV e mata o atualizador
-            Process.Start("pdv.exe");
-            Environment.Exit(0);
+            var refreshDto = new RefreshTokenRequestDto
+            {
+                refreshToken = refreshToken,
+                deviceId = Environment.MachineName,
+            };
+
+            string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string pdvPath = Path.Combine(exeFolder, "PdvFX.exe");
+
+            try
+            {
+                string accessToken = await authService.RefreshToken(refreshDto);
+
+                var fileService = new FileService();
+
+                Boolean shouldUpdate = await fileService.CompareVersion(accessToken);
+
+                if (shouldUpdate)
+                {
+                    var updaterFlow = new UpdaterFlow();
+                 
+                    await updaterFlow.DownloadNewVersion(accessToken);
+                   
+                }
+                else
+                {
+                    Process.Start(pdvPath);
+                    Environment.Exit(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Iniciando o PDV...");
+
+                if (File.Exists(pdvPath))
+                {
+                    Process.Start(pdvPath);
+                }
+
+                Environment.Exit(0);
+            }
         }
 
-        // Função utilitária clássica do C# para esconder a senha no terminal
         static string ReadPasswordHidden()
         {
             string pass = "";
