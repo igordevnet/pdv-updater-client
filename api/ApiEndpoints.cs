@@ -10,13 +10,18 @@ namespace PdvUpdater.Api
 
         static ApiEndpoints()
         {
+            try{
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            IConfiguration config = builder.Build();
+                IConfiguration config = builder.Build();
 
-            _baseUrl = config["ApiConfig:BaseUrl"];
+                _baseUrl = config["ApiConfig:BaseUrl"];
+            }
+            catch (Exception ex){
+                Console.WriteLine($"\n[ERRO] Falha ao se comunicar com o servidor: {ex.Message}");
+            }
         }
 
         public static string Login => $"{_baseUrl}/auth/local/signin";
