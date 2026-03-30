@@ -20,7 +20,7 @@ namespace PdvUpdater.Services {
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
 
             string currentPath = Path.Combine(exeFolder, "PdvFX.exe");
-            string oldPath = Path.Combine(exeFolder, "PdvFX.exe.old");
+            string oldPath = Path.Combine(exeFolder, "PdvFX_old.exe");
 
             if (File.Exists(oldPath))
             {
