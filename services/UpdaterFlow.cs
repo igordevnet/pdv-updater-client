@@ -8,9 +8,11 @@ namespace PdvUpdater.Services {
     public class UpdaterFlow { 
 
         private readonly ApiClient _apiClient;
+        private readonly BackupManager _backupM;
 
         public UpdaterFlow() {
             this._apiClient = new ApiClient();
+            this._backupM = new BackupManager();
         }
 
         public async Task DownloadNewVersion(string accessToken)
@@ -20,21 +22,10 @@ namespace PdvUpdater.Services {
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
 
             string currentPath = Path.Combine(exeFolder, "PdvFX.exe");
-            string oldPath = Path.Combine(exeFolder, "PdvFX.exe.old");
-
-            if (File.Exists(oldPath))
-            {
-                File.Delete(oldPath);
-            }
-
-            if (File.Exists(currentPath))
-            {
-                File.Move(currentPath, oldPath);
-                Console.WriteLine("Arquivo atual renomeado para .old com sucesso.");
-            }
+            _backupM.CreateBackupAndCleanOld();
 
 
-            Console.WriteLine("Baixando a nova versão...");
+            SimpleLogger.Log("Baixando a nova versão...");
 
             await _apiClient.DownloadFileAsync(accessToken, currentPath);
 
@@ -46,7 +37,7 @@ namespace PdvUpdater.Services {
 
             await _apiClient.NotifyDownloadCompleteAsync(saveDto);
 
-            Console.WriteLine("Download concluído!");
+            SimpleLogger.Log("Download concluído!");
         }
     }
 }

@@ -101,7 +101,7 @@ namespace PdvUpdater
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                SimpleLogger.Error(ex.Message);
             }
             finally
             {
