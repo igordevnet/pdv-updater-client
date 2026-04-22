@@ -25,10 +25,48 @@ namespace PdvUpdater.Services
             var serverVersion = await _apiClient.GetVersionAsync(accessToken);
             var localVersion = FileVersionInfo.GetVersionInfo(_pdvPath);
 
-            if (new Version(serverVersion.version) > new Version(localVersion.FileVersion)) {
+            if (new Version(serverVersion.version) > new Version("3.0.0.30")) {
                 return true;
             } else {
                 return false;
+            }
+        }
+
+        public void EnsurePdvIsReady()
+        {
+            string directory = AppContext.BaseDirectory;
+            string pdvPath = Path.Combine(directory, "PdvFX.exe");
+
+            if (File.Exists(pdvPath)) 
+            {
+                return;
+            }
+
+            SimpleLogger.Log("ALERTA: PdvFX.exe não encontrado. Tentando recuperação via rollback...", "WARN");
+
+            var backupFiles = new DirectoryInfo(directory)
+                .GetFiles("PdvFX*.exe")
+                .Where(f => f.Name.ToLower() != "pdvfx.exe")
+                .OrderByDescending(f => f.LastWriteTime)
+                .ToList();
+
+            if (backupFiles.Any())
+            {
+                var latestBackup = backupFiles.First();
+                
+                try 
+                {
+                    File.Copy(latestBackup.FullName, pdvPath);
+                    SimpleLogger.Log($"Recuperação concluída! Versão restaurada: {latestBackup.Name}", "INFO");
+                }
+                catch (Exception ex)
+                {
+                    SimpleLogger.Error($"Falha fatal ao tentar restaurar backup: {ex.Message}");
+                }
+            }
+            else
+            {
+                SimpleLogger.Error("ERRO CRÍTICO: Nenhum executável ou backup encontrado na pasta!");
             }
         }
     }

@@ -18,16 +18,19 @@ namespace PdvUpdater.Services {
         public async Task DownloadNewVersion(string accessToken)
         {
             var data = DataVault.GetData();
+            
             string deviceName = data.DeviceName;
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
 
             string currentPath = Path.Combine(exeFolder, "PdvFX.exe");
-            _backupM.CreateBackupAndCleanOld();
+            string tempPath = Path.Combine(exeFolder, "PdvFX.temp");
 
+            _backupM.CreateBackupAndCleanOld();
 
             SimpleLogger.Log("Baixando a nova versão...");
 
-            await _apiClient.DownloadFileAsync(accessToken, currentPath);
+            await _apiClient.DownloadFileAsync(accessToken, tempPath);
+            File.Move(tempPath, currentPath);
 
             var saveDto = new NotifyDownloadCompleteDto
             {
