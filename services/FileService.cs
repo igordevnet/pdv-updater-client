@@ -1,5 +1,6 @@
 using PdvUpdater.Api;
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Net; 
@@ -56,7 +57,7 @@ namespace PdvUpdater.Services
                 
                 try 
                 {
-                    File.Copy(latestBackup.FullName, pdvPath);
+                    File.Copy(latestBackup.FullName, pdvPath, overwrite: true);
                     SimpleLogger.Log($"Recuperação concluída! Versão restaurada: {latestBackup.Name}", "INFO");
                 }
                 catch (Exception ex)

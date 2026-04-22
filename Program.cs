@@ -81,6 +81,7 @@ namespace PdvUpdater
             };
 
             var updaterFlow = new UpdaterFlow();
+            var fileService = new FileService();
 
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
             string pdvPath = Path.Combine(exeFolder, "PdvFX.exe");
@@ -88,8 +89,6 @@ namespace PdvUpdater
             try
             {
                 string accessToken = await authService.RefreshToken(refreshDto);
-
-                var fileService = new FileService();
 
                 Boolean shouldUpdate = await fileService.CompareVersion(accessToken);
 
@@ -106,7 +105,7 @@ namespace PdvUpdater
             {
                 Console.WriteLine("Iniciando o PDV...");
 
-                updaterFlow.EnsurePdvIsReady();
+                fileService.EnsurePdvIsReady();
 
                 if (File.Exists(pdvPath))
                 {
