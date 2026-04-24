@@ -80,6 +80,9 @@ namespace PdvUpdater
                 deviceId =  data.DeviceId,
             };
 
+            var updaterFlow = new UpdaterFlow();
+            var fileService = new FileService();
+
             string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
             string pdvPath = Path.Combine(exeFolder, "PdvFX.exe");
 
@@ -87,16 +90,11 @@ namespace PdvUpdater
             {
                 string accessToken = await authService.RefreshToken(refreshDto);
 
-                var fileService = new FileService();
-
                 Boolean shouldUpdate = await fileService.CompareVersion(accessToken);
 
                 if (shouldUpdate)
-                {
-                    var updaterFlow = new UpdaterFlow();
-                 
+                {                 
                     await updaterFlow.DownloadNewVersion(accessToken);
-                   
                 }
             }
             catch (Exception ex)
@@ -106,6 +104,8 @@ namespace PdvUpdater
             finally
             {
                 Console.WriteLine("Iniciando o PDV...");
+
+                fileService.EnsurePdvIsReady();
 
                 if (File.Exists(pdvPath))
                 {
