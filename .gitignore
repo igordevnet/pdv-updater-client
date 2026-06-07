@@ -4,6 +4,8 @@ obj/
 *.exe
 *.dll
 *.pdb
+*.ico
+*.lscache
 
 .vs/
 .vscode/
@@ -14,3 +16,7 @@ obj/
 *.tmp
 
 appsettings.json
+
+data.dat
+updater_logs.txt
+updater_logs_old.txt

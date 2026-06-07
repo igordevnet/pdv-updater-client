@@ -11,5 +11,7 @@ namespace PdvUpdater.DTOs{
         public string deviceName { get; set; }
         [JsonProperty("deviceId")]
         public string deviceId { get; set; }
+        [JsonProperty("exeType")]
+        public string exeType { get; set; }
     }
 }

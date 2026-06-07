@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using PdvUpdater.Services;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json; 
@@ -21,6 +22,8 @@ namespace PdvUpdater.Api
                 int statusCode = (int)response.StatusCode;
 
                 throw new Exception($"Erro na API ({statusCode}): {errorBody}");
+            } else {
+                SimpleLogger.Log($"Api Response: Status={response.StatusCode}, Request={response.RequestMessage?.RequestUri}");
             }
         }
 
@@ -102,7 +105,7 @@ namespace PdvUpdater.Api
             
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", saveDto.accessToken);
 
-            var payload = new { deviceName = saveDto.deviceName };
+            var payload = new { deviceName = saveDto.deviceName, version = saveDto.version };
 
             string jsonBody = JsonConvert.SerializeObject(payload);
             var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");

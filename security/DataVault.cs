@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using pdv_updater_client.model;
+using PdvUpdater.model;
 using System;
 using System.IO;
 using System.Security.Cryptography;
