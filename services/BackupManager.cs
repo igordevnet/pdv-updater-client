@@ -6,18 +6,31 @@ using System.Diagnostics;
 namespace PdvUpdater.Services {
     public class BackupManager
     {
-        public void CreateBackupAndCleanOld()
+        public void CreateBackupAndCleanOld(string exeType)
         {
             string directory = AppContext.BaseDirectory;
-            string pdvPath = Path.Combine(directory, "PdvFX.exe");
+            string exePath;
 
-            if (!File.Exists(pdvPath)) return;
+            switch (exeType) {
+                case "PdvFX":
+                    exePath = Path.Combine(directory, "PdvFX.exe");
+                    break;
+                
+                case "DotMart":
+                    exePath = Path.Combine(directory, "DotMart.exe");
+                    break;
 
-            var versionInfo = FileVersionInfo.GetVersionInfo(pdvPath);
+                default:
+                    throw new Exception($"Tipo de execultável inválido: {exeType}");
+            }
+
+            if (!File.Exists(exePath)) return;
+
+            var versionInfo = FileVersionInfo.GetVersionInfo(exePath);
             string fullVersion = versionInfo.FileVersion ?? "0.0.0.0";
             string lastDigits = fullVersion.Split('.').Last();
 
-            string backupFileName = $"PdvFX{lastDigits}.exe";
+            string backupFileName = $"{exeType}{lastDigits}.exe";
             string backupFilePath = Path.Combine(directory, backupFileName);
 
             if (File.Exists(backupFilePath))
@@ -25,18 +38,34 @@ namespace PdvUpdater.Services {
                 File.Delete(backupFilePath);
             }
             
-            File.Move(pdvPath, backupFilePath);
+            File.Move(exePath, backupFilePath);
             SimpleLogger.Log($"Backup criado: {backupFileName}");
 
-            CleanOldBackups(directory, 5);
+            CleanOldBackups(directory, 5, exeType);
         }
 
-        private void CleanOldBackups(string directory, int maxBackups)
+        private void CleanOldBackups(string directory, int maxBackups, string exeType)
         {
-            var pdvFiles = new DirectoryInfo(directory).GetFiles("PdvFX*.exe");
+            FileInfo[] exeFiles;
+            string exeName;
 
-            var backups = pdvFiles
-                .Where(f => f.Name.ToLower() != "pdvfx.exe")
+            switch (exeType) {
+                case "PdvFX":
+                    exeFiles = new DirectoryInfo(directory).GetFiles("Pdv*.exe");
+                    exeName = "PdvFX.exe";
+                    break;
+
+                case "DotMart":
+                    exeFiles = new DirectoryInfo(directory).GetFiles("DotMart*.exe");
+                    exeName = "DotMart.exe";
+                    break;
+
+                default:
+                    throw new Exception($"Tipo de execultável inválido: {exeType}");
+            }
+
+            var backups = exeFiles
+                .Where(f => f.Name.ToLower() != exeName)
                 .OrderByDescending(f => f.LastWriteTime)
                 .ToList();
 

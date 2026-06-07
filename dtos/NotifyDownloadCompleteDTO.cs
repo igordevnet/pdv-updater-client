@@ -6,5 +6,7 @@ namespace PdvUpdater.DTOs{
         public string accessToken { get; set; }
         [JsonProperty("deviceName")]
         public string deviceName { get; set; }
+        [JsonProperty("version")]
+        public string version { get; set; }
     }
 }

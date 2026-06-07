@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using pdv_updater_client.model;
+using PdvUpdater.model;
 using PdvUpdater.Api;
 using PdvUpdater.DTOs;
 using System;
@@ -21,7 +21,8 @@ namespace PdvUpdater.Services {
             var data = new VaultData {
                 RefreshToken = tokens.refresh_token,
                 DeviceId = loginDto.deviceId,
-                DeviceName = loginDto.deviceName
+                DeviceName = loginDto.deviceName,
+                ExeType = loginDto.exeType
             };
 
             DataVault.SaveData(data);

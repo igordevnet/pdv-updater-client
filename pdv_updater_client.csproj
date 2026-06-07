@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <ApplicationIcon>pdv.ico</ApplicationIcon>
+    <ApplicationIcon>dotmart.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

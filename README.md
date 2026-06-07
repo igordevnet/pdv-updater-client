@@ -1,59 +1,203 @@
-# 🖥️ POS Updater Client - C# Desktop Application
+# POS Updater Client
 
-A lightweight, secure, and autonomous Windows application designed to keep Point of Sale (POS) systems updated seamlessly without disrupting cashier operations.
+A Windows desktop updater for POS/PDV executables. It registers a device with the POS Updater API, stores refresh credentials locally with Windows DPAPI, checks for new `PdvFX` or `DotMart` versions, downloads updates safely, keeps backups, and restarts the POS when it is safe to do so.
 
-![C#](https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=c-sharp&logoColor=white)
-![.NET](https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
-![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Security](https://img.shields.io/badge/Security-DPAPI-red?style=for-the-badge)
-   
-## 📋 About the Project
+## 🏗️ Architecture
 
-This desktop client is the front-line component of the POS Updater ecosystem. Deployed directly on the cash register machines, it communicates with the **POS Updater NestJS API** to fetch, verify, and install the latest versions of the main POS software.
+This client is the workstation-side piece of the POS updater system. The server owns authentication, version metadata, executable downloads, and update audit logging; the client handles local setup, token refresh, version comparison, file replacement, rollback, and process restart.
 
-It was built with a strong focus on **Hardware-Bound Security** and **System Resilience**, ensuring that the software runs only on authorized machines and can automatically recover from unexpected file loss.
+* **Runtime:** .NET Framework 4.8 Windows executable
+* **Networking:** `HttpClient` against the NestJS POS Updater API
+* **Configuration:** `appsettings.json` loaded from the application directory
+* **Security:** Windows DPAPI using `DataProtectionScope.CurrentUser`
+* **Storage:** `%LOCALAPPDATA%\PdvUpdater\data.dat` for encrypted device/session data
+* **Updates:** File version comparison through Windows executable metadata
+* **Recovery:** Local executable backups and forced rollback support
+* **Logging:** Rotating text logs in the application directory
 
-## ✨ Key Features
+## 🔄 Main Flow
 
-- 🛡️ **Hardware-Bound Encryption (Windows DPAPI):** JWT Refresh Tokens and configuration files are encrypted at rest using `DataProtectionScope.LocalMachine`. If a malicious user copies the application folder to an unauthorized PC, the decryption fails automatically.
-- 🔒 **TLS 1.2 Enforced Security:** All network traffic to the NestJS backend is heavily encrypted in transit.
-- 🔄 **Autonomous Update Cycle:** Runs silently in the background. It authenticates, checks for version discrepancies, downloads the new executable, and registers the download with the central server.
-- 🚀 **Zero Cashier Friction:** Automates the replacement of the `.exe` file without requiring the cashier to click through installers or input daily credentials.
-- 🛟 **Self-Healing & Auto-Rollback:** Automatically detects if the main executable (`PdvFX.exe`) is missing or corrupted and instantly restores the most recent stable backup to keep the cash register operational.
-- 🗄️ **Smart Backup Retention:** Before applying any update, the system creates a versioned backup of the current executable. It strictly maintains only the 5 most recent backups, automatically pruning older files to prevent disk space bloat.
+1. The updater starts with a global mutex so only one instance runs.
+2. On first run, it opens a console setup flow and asks the operator to choose `PdvFX` or `DotMart`.
+3. The operator enters company name, password, and device name.
+4. The client generates a device ID, signs in with the API, and stores the refresh token/device metadata in encrypted `data.dat`.
+5. On later runs, the client refreshes the access token silently.
+6. It calls `/updates/check` and compares the server version with the local executable version.
+7. If an update is needed, it downloads the new executable to a temporary file.
+8. It validates the downloaded file has version metadata, backs up the current executable, replaces it, and calls `/updates/save`.
+9. It launches the selected executable if it is not already running.
+10. It keeps polling every 10 minutes for future updates.
 
-## 🏗️ Architecture & Workflow
+## 🧩 Supported Executables
 
-1. **Pre-Flight Check (Self-Healing):** Upon execution, the client verifies the existence of the POS executable. If missing, it scans the directory and triggers a rollback to the latest local backup.
-2. **Hardware Fingerprinting:** Reads unique machine identifiers to generate a `deviceId`.
-3. **Authentication:** Uses the `deviceId` to log in via the NestJS Server.
-4. **Secure Storage:** The server returns Access and Refresh Tokens, which the C# client encrypts using Windows DPAPI and stores locally as a `.dat` file.
-5. **Polling / Version Checking:** The client securely requests the latest version info from the server and compares it against the local binary.
-6. **Smart Backup:** If an update is required, the current `PdvFX.exe` is safely archived (e.g., `PdvFX62.exe`), and legacy backups beyond the retention limit are purged.
-7. **Download & Execution:** The client downloads the new executable via an octet-stream, replaces the old binary, and notifies the backend to update the company's Google Sheets dashboard.
+Valid executable types are:
 
-## 🛠️ Tech Stack
+* `PdvFX`
+* `DotMart`
 
-- **Language:** C#
-- **Framework:** .NET (Windows Forms / Console / Worker Service)
-- **Security:** `System.Security.Cryptography.ProtectedData` (DPAPI), TLS 1.2 Protocol
-- **Networking:** `HttpClient` for RESTful communication with the Node.js backend
+The updater expects the selected executable to live beside the updater binaries:
 
-## 🚀 Installation & Setup
+```text
+ApplicationFolder/
+  pdv_updater_client.exe
+  appsettings.json
+  PdvFX.exe
+  DotMart.exe
+```
 
-### Requirements
-- Windows OS (Windows 10 / 11 or Windows Server)
-- .NET Runtime installed on the target machine
+The executable files are deployment artifacts and must not be committed to Git.
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Windows 10/11 or Windows Server
+* .NET Framework 4.8 runtime on target machines
+* Visual Studio or MSBuild/.NET tooling for development builds
+* Access to the POS Updater API
 
 ### Configuration
-1. Clone the repository and open the solution in Visual Studio.
-2. Update the API Base URL in the `App.config` or `appsettings.json` file to point to your deployed NestJS Server:
-   ```xml
-   <appSettings>
-     <add key="ApiBaseUrl" value="[https://your-nestjs-api-domain.com/api](https://your-nestjs-api-domain.com/api)" />
-   </appSettings>
-Build the solution in Release mode.
 
-Deploy the generated .exe and associated .dll files to the target POS machine.
+Create `appsettings.json` from the example file:
 
-⚠️ Security Notice: Do not distribute the .dat token files across different machines. The DPAPI implementation strictly binds the payload to the physical hardware that generated it.
+```json
+{
+  "ApiConfig": {
+    "BaseUrl": "http://localhost:3000"
+  },
+  "CNPJ": "store-cnpj"
+}
+```
+
+| Key | Description |
+| :--- | :--- |
+| `ApiConfig:BaseUrl` | Base URL of the POS Updater API. |
+| `CNPJ` | Store/company CNPJ used to validate forced updates. |
+
+`appsettings.json` is ignored by Git because it can contain environment-specific values.
+
+### Build
+
+```powershell
+dotnet restore
+dotnet build -c Release
+```
+
+For .NET Framework 4.8 builds, Visual Studio or the .NET Framework targeting pack may be required.
+
+### First Run Setup
+
+On the first run, no encrypted vault exists yet. The updater will:
+
+1. Show a console selector for `PdvFX` or `DotMart`.
+2. Ask for company name, password, and device name.
+3. Send a login request to the API.
+4. Save the refresh token, generated device ID, device name, and selected executable type into `%LOCALAPPDATA%\PdvUpdater\data.dat`.
+
+After setup, the updater can run silently.
+
+## 📡 API Contract
+
+The client talks to these server endpoints:
+
+| Method | Endpoint | Purpose |
+| :--- | :--- | :--- |
+| `POST` | `/auth/local/signin` | First-run authentication and refresh-token creation. |
+| `POST` | `/auth/refresh` | Silent access-token refresh. |
+| `GET` | `/updates/check` | Returns latest version and optional force-update metadata. |
+| `GET` | `/updates/download` | Streams the selected executable. |
+| `POST` | `/updates/save` | Notifies the server after install or rollback. |
+
+The client sends `exeType` as either `PdvFX` or `DotMart`.
+
+## 🧠 Update Behavior
+
+### Normal Update
+
+* Reads the local executable version with `FileVersionInfo`.
+* Compares it with the version returned by `/updates/check`.
+* Downloads the update to `PdvFX.temp` or `DotMart.temp`.
+* Validates that the downloaded file exists, is non-empty, and exposes version metadata.
+* Backs up the current executable before replacing it.
+* Notifies the server with the installed version.
+
+### Forced Update / Rollback
+
+When the server returns `force = true` and the payload CNPJ matches local config:
+
+* If server version is newer, the client updates normally.
+* If server version is older, the client attempts rollback from local backups.
+* Rollback looks for a backup whose filename contains the last version segment.
+* After rollback, the client notifies the server with the target version.
+
+### Restart Logic
+
+For `PdvFX`, after a non-boot update, the client checks the latest `NFCe*.ini` file and reads `Estado`.
+
+* `Estado = 2`: PDV is considered free and can be restarted.
+* Any other status: restart is postponed.
+
+`DotMart` does not use the PDV restart flow.
+
+## 💾 Backup And Recovery
+
+Before replacing an executable, the client moves the current file to a versioned backup name:
+
+```text
+PdvFX52.exe
+DotMart52.exe
+```
+
+The backup manager keeps the latest 5 backups for the selected executable type.
+
+If the main executable is missing at startup, the client tries to restore the newest backup automatically.
+
+## 🔐 Security
+
+* TLS 1.2 is enforced for API communication.
+* Refresh tokens are encrypted locally with Windows DPAPI `CurrentUser` scope.
+* The vault file is stored at `%LOCALAPPDATA%\PdvUpdater\data.dat`.
+* Access tokens are kept in memory and refreshed silently.
+* `appsettings.json`, executables, DLLs, PDBs, icons, logs, and build outputs should not be committed.
+
+## 🔭 Observability
+
+Logs are written beside the updater executable:
+
+| File | Purpose |
+| :--- | :--- |
+| `updater_logs.txt` | Current updater log file. |
+| `updater_logs_old.txt` | Rotated previous log file. |
+
+Logs rotate when the current file reaches 5 MB.
+
+## 🧪 Testing
+
+There is no dedicated automated test project in this repository yet. For now, validate changes with:
+
+```powershell
+dotnet build -c Release
+```
+
+Recommended manual checks:
+
+* First-run setup creates encrypted `data.dat`.
+* Refresh-token flow works after restarting the updater.
+* `/updates/check` detects newer versions.
+* Downloaded executables replace the old file only after validation.
+* Backup restoration works when the main executable is missing.
+* Forced rollback works for matching CNPJ/version data.
+
+## ⚙️ Git Safety
+
+Do not commit deployment artifacts or customer-specific runtime files:
+
+* `PdvFX.exe`
+* `DotMart.exe`
+* `*.dll`
+* `*.pdb`
+* `*.ico`
+* `appsettings.json`
+* `data.dat`
+* build folders such as `bin/` and `obj/`
+* generated cache files such as `*.lscache`

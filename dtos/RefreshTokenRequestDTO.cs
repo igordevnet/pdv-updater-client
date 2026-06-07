@@ -6,5 +6,7 @@ namespace PdvUpdater.DTOs{
         public string refreshToken { get; set; }
         [JsonProperty("deviceId")]
         public string deviceId { get; set; }
+        [JsonProperty("exeType")]
+        public string exeType { get; set; }
     }
 }
